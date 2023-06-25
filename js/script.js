@@ -122,7 +122,7 @@ async function displayMovieDetails() {
     <ul>
       <li><span class="text-secondary">Budget:</span> $${addCommas(movie.budget)}</li>
       <li><span class="text-secondary">Revenue:</span>$${addCommas(movie.revenue)}</li>
-      <li><span class="text-secondary">Runtime:</span> $${movie.runtime} minutes</li>
+      <li><span class="text-secondary">Runtime:</span> ${movie.runtime} minutes</li>
       <li><span class="text-secondary">Status:</span> ${movie.status}</li>
     </ul>
     <h4>Production Companies</h4>
@@ -216,6 +216,54 @@ async function displayShowDetails() {
 
     }
 
+    // Display Slider Movies
+    async function displaySlider() {
+        const { results } = await fetchAPIData('movie/now_playing');
+
+        results.forEach((movie)=>{
+            const div = document.createElement('div');
+            div.classList.add('swiper-slide');
+            div.innerHTML = `
+                <div class="swiper-slide">
+                    <a href="movie-details.html?id=${movie.id}">
+                        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />
+                    </a>
+                    <h4 class="swiper-rating">
+                        <i class="fas fa-star text-secondary"></i> ${movie.vote_average} / 10
+                    </h4>
+                </div>
+            `;
+
+            document.querySelector('.swiper-wrapper').appendChild(div);
+
+            initSwiper();
+        });
+    }
+    function initSwiper() {
+        const swiper = new Swiper('.swiper',{
+            slidesPerView : 1,
+            spaceBetween : 30,
+            freeMode : true,
+            loop : true,
+            autoplay:{
+                delay : 4000,
+                disableOnInteraction: false
+            },
+            breakpoints:{
+                500: {
+                    slidesPerView : 2
+                },
+                700: {
+                    slidesPerView : 3
+                },
+                1200: {
+                    slidesPerView : 4
+                }
+            }
+        });
+    }
+   
+    
 async function fetchAPIData(endpoint) {
     const API_KEY = '98dc1c8d10a93c6261ae282211b55ffd';
     const API_URL = 'https://api.themoviedb.org/3/';
@@ -255,6 +303,7 @@ function init() {
     switch (global.currentPage) {
         case '/':
         case '/index.html':
+            displaySlider();
             displayPopularMovies();
             break;
         case '/shows.html':
